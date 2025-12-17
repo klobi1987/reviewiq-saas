@@ -1321,7 +1321,7 @@
                 <li><a href="#pricing">Cijene</a></li>
                 <li><a href="#order">Naruči</a></li>
             </ul>
-            <a href="#order" class="nav-cta">Naruči €49</a>
+            <a href="#order" class="nav-cta">Test FREE</a>
         </div>
     </nav>
 
@@ -1577,9 +1577,9 @@
             </div>
 
             <div class="order-form-wrapper">
-                <div class="order-price-badge">
-                    <span class="order-price">€49</span>
-                    <span class="order-price-note">jednokratno</span>
+                <div class="order-price-badge" style="background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);">
+                    <span class="order-price">FREE</span>
+                    <span class="order-price-note">test mode</span>
                 </div>
 
                 <form class="order-form" id="orderForm">
@@ -1600,13 +1600,13 @@
                     </div>
 
                     <button type="submit" class="order-submit" id="orderSubmit">
-                        <span class="order-submit-text">Nastavi na plaćanje</span>
+                        <span class="order-submit-text">Pokreni Scraping</span>
                         <span class="order-submit-loading" style="display: none;">
                             <svg class="spinner" width="20" height="20" viewBox="0 0 24 24">
                                 <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3" fill="none" opacity="0.3"/>
                                 <path d="M12 2a10 10 0 0 1 10 10" stroke="currentColor" stroke-width="3" fill="none" stroke-linecap="round"/>
                             </svg>
-                            Učitavanje...
+                            Pokrećem...
                         </span>
                         <svg class="order-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M5 12h14M12 5l7 7-7 7"/>
@@ -1615,17 +1615,18 @@
 
                     <div class="order-secure">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
-                            <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                            <circle cx="12" cy="12" r="10"/>
+                            <path d="M12 6v6l4 2"/>
                         </svg>
-                        <span>Sigurno plaćanje preko Stripe</span>
+                        <span>Scraping traje 5-30 minuta ovisno o broju recenzija</span>
                     </div>
                 </form>
 
                 <div class="order-success" id="orderSuccess" style="display: none;">
-                    <div class="order-success-icon">✓</div>
-                    <h3>Preusmjeravanje na Stripe...</h3>
-                    <p>Molimo pričekajte.</p>
+                    <div class="order-success-icon">🚀</div>
+                    <h3>Scraping pokrenut!</h3>
+                    <p id="orderMessage">Primit ćete email kada izvještaj bude gotov.</p>
+                    <p id="orderIdDisplay" style="margin-top: 1rem; font-family: monospace; color: #a5b4fc;"></p>
                 </div>
             </div>
         </div>
@@ -1743,8 +1744,12 @@
     </footer>
 
     <script>
-        // API Configuration - change this to your backend URL in production
-        const API_BASE_URL = 'http://localhost:8000';
+        // API Configuration
+        // After Railway deployment, update this to your Railway URL, e.g.:
+        // const API_BASE_URL = 'https://reviewiq-backend.up.railway.app';
+        const API_BASE_URL = window.location.hostname === 'localhost'
+            ? 'http://localhost:8000'
+            : 'https://YOUR-RAILWAY-URL.up.railway.app'; // <-- UPDATE THIS AFTER RAILWAY DEPLOY
 
         // Navbar scroll effect
         const navbar = document.getElementById('navbar');
@@ -1756,7 +1761,7 @@
             }
         });
 
-        // Order Form - Stripe Checkout
+        // Order Form - Start Scraping
         document.getElementById('orderForm').addEventListener('submit', async function(e) {
             e.preventDefault();
 
@@ -1783,8 +1788,8 @@
             arrow.style.display = 'none';
 
             try {
-                // Call backend to create Stripe checkout session
-                const response = await fetch(`${API_BASE_URL}/create-checkout`, {
+                // Call backend to start scraping
+                const response = await fetch(`${API_BASE_URL}/start-scrape`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -1797,23 +1802,23 @@
                 });
 
                 if (!response.ok) {
-                    throw new Error('Greška prilikom kreiranja narudžbe');
+                    const errorData = await response.json();
+                    throw new Error(errorData.detail || 'Greška prilikom pokretanja scrapinga');
                 }
 
                 const data = await response.json();
 
-                // Show success message briefly
+                // Show success message
                 document.getElementById('orderForm').style.display = 'none';
                 document.getElementById('orderSuccess').style.display = 'block';
+                document.getElementById('orderMessage').textContent = `Email: ${email}`;
+                document.getElementById('orderIdDisplay').textContent = `Order ID: ${data.order_id} | Status: ${data.status}`;
 
-                // Redirect to Stripe Checkout
-                setTimeout(() => {
-                    window.location.href = data.checkout_url;
-                }, 500);
+                console.log('Scraping started:', data);
 
             } catch (error) {
                 console.error('Error:', error);
-                alert('Došlo je do greške. Molimo pokušajte ponovno ili nas kontaktirajte.');
+                alert('Došlo je do greške: ' + error.message);
 
                 // Reset button
                 submitBtn.disabled = false;
@@ -1822,21 +1827,6 @@
                 arrow.style.display = 'inline';
             }
         });
-
-        // Check for canceled payment (redirect back from Stripe)
-        const urlParams = new URLSearchParams(window.location.search);
-        if (urlParams.get('canceled') === 'true') {
-            // Show message that payment was canceled
-            const orderSection = document.getElementById('order');
-            if (orderSection) {
-                orderSection.scrollIntoView({ behavior: 'smooth' });
-                setTimeout(() => {
-                    alert('Plaćanje je otkazano. Možete pokušati ponovno.');
-                }, 500);
-            }
-            // Clear the URL parameter
-            window.history.replaceState({}, document.title, window.location.pathname);
-        }
 
         // Contact Form submission
         document.getElementById('contactForm').addEventListener('submit', function(e) {

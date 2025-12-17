@@ -127,13 +127,9 @@ async def process_scrape_task(payload: dict) -> str:
     print(f"[WORKER] Starting scrape for order {order_id}")
     print(f"[WORKER] URL: {restaurant_url}")
 
-    # Import scraper from scrapers folder
-    scrapers_path = Path(__file__).parent.parent.parent / "scrapers"
-    sys.path.insert(0, str(scrapers_path))
-
     try:
-        # 1. Run the scraper
-        from tripadvisor.scraper import TripAdvisorScraper
+        # 1. Run the scraper (imported from local scrapers folder)
+        from scrapers.tripadvisor.scraper import TripAdvisorScraper
 
         # Create temp output folder
         output_dir = settings.REPORTS_PATH / order_id
@@ -146,7 +142,8 @@ async def process_scrape_task(payload: dict) -> str:
         def run_scraper():
             scraper = TripAdvisorScraper(
                 base_url=restaurant_url,
-                max_reviews=500  # Limit for €49 tier
+                max_reviews=500,  # Limit for free tier
+                headless=True    # Required for server deployment
             )
             scraper.run()
             return scraper.reviews

@@ -25,8 +25,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, EmailStr
 import stripe
 
-# Add parent directory to path for imports
-sys.path.insert(0, str(Path(__file__).parent.parent.parent / "scrapers" / "analysis"))
+# Local imports only - no external path manipulation needed
 
 from config import settings
 
@@ -138,16 +137,80 @@ class OrderStatus(BaseModel):
     expires_at: Optional[str]
 
 
+class ScrapeRequest(BaseModel):
+    email: EmailStr
+    restaurant_url: str
+    restaurant_name: Optional[str] = None
+
+
+class ScrapeResponse(BaseModel):
+    order_id: str
+    status: str
+    message: str
+
+
 # ============== API Endpoints ==============
 
 @app.get("/")
 async def root():
-    """Health check endpoint."""
+    """Root endpoint with API info."""
     return {
         "status": "ok",
         "service": "ReviewIQ API",
         "version": "1.0.0"
     }
+
+
+@app.get("/health")
+async def health_check():
+    """Health check endpoint for Railway."""
+    return {"status": "healthy"}
+
+
+@app.post("/start-scrape", response_model=ScrapeResponse)
+async def start_scrape(request: ScrapeRequest):
+    """
+    Start scraping without payment.
+
+    Creates order and queues scraping task immediately.
+    """
+    try:
+        # Generate unique order ID
+        order_id = str(uuid.uuid4())[:8]
+        restaurant_name = request.restaurant_name or "Restaurant"
+
+        # Save order to database
+        conn = get_db()
+        cursor = conn.cursor()
+        cursor.execute("""
+            INSERT INTO orders (id, email, restaurant_url, restaurant_name, status)
+            VALUES (?, ?, ?, ?, 'processing')
+        """, (order_id, request.email, request.restaurant_url, restaurant_name))
+        conn.commit()
+        conn.close()
+
+        # Queue scraping task for worker
+        from task_queue import add_task, init_task_db
+        init_task_db()
+
+        task_id = add_task("scrape_and_report", {
+            "order_id": order_id,
+            "email": request.email,
+            "restaurant_url": request.restaurant_url,
+            "restaurant_name": restaurant_name
+        })
+
+        print(f"[API] Task {task_id} queued for order {order_id}")
+        print(f"[API] URL: {request.restaurant_url}")
+
+        return ScrapeResponse(
+            order_id=order_id,
+            status="queued",
+            message=f"Scraping started! Task ID: {task_id}. Check /order/{order_id} for status."
+        )
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @app.post("/create-checkout", response_model=CheckoutResponse)
