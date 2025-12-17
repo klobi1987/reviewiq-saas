@@ -1,0 +1,1885 @@
+<!DOCTYPE html>
+<html lang="hr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ReviewIQ | AI-Powered Review Intelligence for Hospitality</title>
+    <meta name="description" content="Transform your TripAdvisor & Google reviews into actionable business intelligence. Know exactly what guests from each country think about your restaurant or hotel.">
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #ec4899;
+            --accent: #06b6d4;
+            --dark: #0f172a;
+            --dark-light: #1e293b;
+            --gray: #64748b;
+            --light: #f8fafc;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --gradient-1: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --gradient-2: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --gradient-3: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            --gradient-hero: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #312e81 100%);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--dark);
+            color: var(--light);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Animated Background */
+        .bg-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: var(--gradient-hero);
+        }
+
+        .bg-animation::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background:
+                radial-gradient(circle at 20% 80%, rgba(99, 102, 241, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(236, 72, 153, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(6, 182, 212, 0.1) 0%, transparent 40%);
+            animation: pulse 15s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        /* Floating orbs */
+        .orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            animation: float 20s ease-in-out infinite;
+        }
+
+        .orb-1 {
+            width: 600px;
+            height: 600px;
+            background: rgba(99, 102, 241, 0.2);
+            top: -200px;
+            right: -200px;
+            animation-delay: 0s;
+        }
+
+        .orb-2 {
+            width: 400px;
+            height: 400px;
+            background: rgba(236, 72, 153, 0.15);
+            bottom: -100px;
+            left: -100px;
+            animation-delay: -5s;
+        }
+
+        .orb-3 {
+            width: 300px;
+            height: 300px;
+            background: rgba(6, 182, 212, 0.15);
+            top: 50%;
+            left: 50%;
+            animation-delay: -10s;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            25% { transform: translate(50px, -50px) scale(1.1); }
+            50% { transform: translate(-30px, 30px) scale(0.95); }
+            75% { transform: translate(20px, 20px) scale(1.05); }
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            padding: 1rem 2rem;
+            transition: all 0.3s ease;
+        }
+
+        nav.scrolled {
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #fff 0%, #a5b4fc 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: #fff;
+        }
+
+        .nav-cta {
+            background: var(--primary);
+            color: #fff;
+            padding: 0.75rem 1.5rem;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .nav-cta:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 40px rgba(99, 102, 241, 0.4);
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 6rem 2rem 4rem;
+            position: relative;
+        }
+
+        .hero-content {
+            max-width: 900px;
+            text-align: center;
+            position: relative;
+            z-index: 10;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(99, 102, 241, 0.2);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            font-size: 0.875rem;
+            color: #a5b4fc;
+            margin-bottom: 1.5rem;
+            animation: fadeInUp 0.6s ease;
+        }
+
+        .hero h1 {
+            font-size: clamp(2.5rem, 6vw, 4.5rem);
+            font-weight: 900;
+            line-height: 1.1;
+            margin-bottom: 1.5rem;
+            animation: fadeInUp 0.6s ease 0.1s backwards;
+        }
+
+        .hero h1 span {
+            background: linear-gradient(135deg, #6366f1 0%, #ec4899 50%, #06b6d4 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero p {
+            font-size: 1.25rem;
+            color: rgba(255, 255, 255, 0.7);
+            max-width: 600px;
+            margin: 0 auto 2rem;
+            animation: fadeInUp 0.6s ease 0.2s backwards;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            animation: fadeInUp 0.6s ease 0.3s backwards;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 1rem;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: none;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: #fff;
+            box-shadow: 0 10px 40px rgba(99, 102, 241, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 20px 60px rgba(99, 102, 241, 0.4);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Stats Bar */
+        .stats-bar {
+            display: flex;
+            justify-content: center;
+            gap: 3rem;
+            margin-top: 4rem;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            animation: fadeInUp 0.6s ease 0.4s backwards;
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #fff 0%, #a5b4fc 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .stat-label {
+            font-size: 0.875rem;
+            color: rgba(255, 255, 255, 0.5);
+            margin-top: 0.25rem;
+        }
+
+        /* Section styling */
+        section {
+            padding: 6rem 2rem;
+            position: relative;
+        }
+
+        .section-header {
+            text-align: center;
+            max-width: 700px;
+            margin: 0 auto 4rem;
+        }
+
+        .section-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.2) 0%, rgba(236, 72, 153, 0.2) 100%);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            font-size: 0.875rem;
+            color: #a5b4fc;
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        .section-header h2 {
+            font-size: clamp(2rem, 4vw, 3rem);
+            font-weight: 800;
+            margin-bottom: 1rem;
+        }
+
+        .section-header p {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 1.125rem;
+        }
+
+        /* Solution Section */
+        .solution {
+            background: linear-gradient(180deg, rgba(99, 102, 241, 0.05) 0%, transparent 100%);
+        }
+
+        .solution-grid {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+        }
+
+        .solution-card {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(236, 72, 153, 0.05) 100%);
+            border: 1px solid rgba(99, 102, 241, 0.2);
+            border-radius: 24px;
+            padding: 2.5rem;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.4s ease;
+        }
+
+        .solution-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary) 0%, var(--secondary) 100%);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .solution-card:hover {
+            transform: translateY(-8px);
+            border-color: rgba(99, 102, 241, 0.4);
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .solution-card:hover::before {
+            opacity: 1;
+        }
+
+        .solution-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.75rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .solution-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .solution-card p {
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 1.5rem;
+        }
+
+        .solution-features {
+            list-style: none;
+        }
+
+        .solution-features li {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.5rem 0;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.95rem;
+        }
+
+        .solution-features li::before {
+            content: '✓';
+            color: var(--success);
+            font-weight: bold;
+        }
+
+        /* Case Study */
+        .case-study {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(6, 182, 212, 0.05) 100%);
+            border-radius: 32px;
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 4rem;
+            border: 1px solid rgba(99, 102, 241, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .case-study-header {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .case-study-logo {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #1e3a5f 0%, #2d5a87 100%);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            font-weight: 800;
+            color: #fff;
+        }
+
+        .case-study-title h3 {
+            font-size: 1.75rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .case-study-title p {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .case-study-stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 2rem;
+            margin: 2rem 0;
+            padding: 2rem 0;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .case-stat {
+            text-align: center;
+        }
+
+        .case-stat-value {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .case-stat-label {
+            font-size: 0.875rem;
+            color: rgba(255, 255, 255, 0.5);
+            margin-top: 0.5rem;
+        }
+
+        .case-study-insights {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .insight {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 16px;
+            padding: 1.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .insight-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .insight-flag {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            flex-shrink: 0;
+        }
+
+        .insight-flag::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 50%;
+            padding: 2px;
+            background: linear-gradient(135deg, rgba(255,255,255,0.4), rgba(255,255,255,0.1));
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+        }
+
+        .flag-uk {
+            background: linear-gradient(135deg, #012169 0%, #C8102E 50%, #012169 100%);
+        }
+
+        .flag-uk::after {
+            content: '🇬🇧';
+            font-size: 1.8rem;
+        }
+
+        .flag-us {
+            background: linear-gradient(135deg, #3C3B6E 0%, #B22234 100%);
+        }
+
+        .flag-us::after {
+            content: '🇺🇸';
+            font-size: 1.8rem;
+        }
+
+        .flag-de {
+            background: linear-gradient(180deg, #000 33%, #DD0000 33%, #DD0000 66%, #FFCE00 66%);
+        }
+
+        .flag-de::after {
+            content: '🇩🇪';
+            font-size: 1.8rem;
+        }
+
+        .flag-fr {
+            background: linear-gradient(90deg, #002395 33%, #fff 33%, #fff 66%, #ED2939 66%);
+        }
+
+        .flag-fr::after {
+            content: '🇫🇷';
+            font-size: 1.8rem;
+        }
+
+        .insight-country {
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        .insight-percent {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 800;
+            font-size: 0.9rem;
+        }
+
+        .insight p {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        .insight:hover {
+            background: rgba(99, 102, 241, 0.08);
+            border-color: rgba(99, 102, 241, 0.2);
+            transform: translateY(-2px);
+            transition: all 0.3s ease;
+        }
+
+        .insight:hover .insight-flag {
+            transform: scale(1.1);
+            transition: transform 0.3s ease;
+        }
+
+        /* Case study footer badge */
+        .case-study-footer {
+            margin-top: 2.5rem;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
+        }
+
+        .case-study-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(236, 72, 153, 0.1));
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            font-size: 0.95rem;
+        }
+
+        .case-study-badge-icon {
+            font-size: 1.25rem;
+        }
+
+        .case-study-badge span {
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .case-study-badge strong {
+            color: #a5b4fc;
+        }
+
+        /* Pricing */
+        .pricing {
+            background: linear-gradient(180deg, transparent 0%, rgba(99, 102, 241, 0.05) 50%, transparent 100%);
+        }
+
+        .pricing-grid {
+            max-width: 1100px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+        }
+
+        .pricing-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            padding: 2.5rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .pricing-card.featured {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.15) 0%, rgba(236, 72, 153, 0.1) 100%);
+            border-color: var(--primary);
+            transform: scale(1.05);
+        }
+
+        .pricing-card.featured::before {
+            content: 'NAJPOPULARNIJE';
+            position: absolute;
+            top: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: #fff;
+            padding: 0.5rem 1.5rem;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+        }
+
+        .pricing-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(99, 102, 241, 0.3);
+        }
+
+        .pricing-card.featured:hover {
+            transform: scale(1.05) translateY(-5px);
+        }
+
+        .pricing-tier {
+            font-size: 0.875rem;
+            color: var(--primary);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 0.5rem;
+        }
+
+        .pricing-name {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .pricing-price {
+            margin-bottom: 1.5rem;
+        }
+
+        .pricing-price .amount {
+            font-size: 3.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #fff 0%, #a5b4fc 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .pricing-price .currency {
+            font-size: 1.5rem;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .pricing-desc {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.95rem;
+            margin-bottom: 2rem;
+        }
+
+        .pricing-features {
+            list-style: none;
+            text-align: left;
+            margin-bottom: 2rem;
+        }
+
+        .pricing-features li {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            font-size: 0.95rem;
+        }
+
+        .pricing-features li::before {
+            content: '✓';
+            color: var(--success);
+            font-weight: bold;
+        }
+
+        /* Order Section */
+        .order-section {
+            background: linear-gradient(180deg, rgba(16, 185, 129, 0.05) 0%, rgba(99, 102, 241, 0.1) 100%);
+            padding: 6rem 2rem;
+        }
+
+        .order-container {
+            max-width: 1100px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+        }
+
+        .order-content h2 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+        }
+
+        .order-content > p {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 1.1rem;
+            margin-bottom: 2rem;
+        }
+
+        .order-features {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .order-feature {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.95rem;
+        }
+
+        .order-feature-icon {
+            font-size: 1.25rem;
+        }
+
+        .order-form-wrapper {
+            background: rgba(255, 255, 255, 0.03);
+            border: 2px solid rgba(16, 185, 129, 0.3);
+            border-radius: 24px;
+            padding: 2.5rem;
+            position: relative;
+        }
+
+        .order-price-badge {
+            position: absolute;
+            top: -20px;
+            right: 30px;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            padding: 0.75rem 1.5rem;
+            border-radius: 50px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            box-shadow: 0 10px 40px rgba(16, 185, 129, 0.4);
+        }
+
+        .order-price {
+            font-size: 1.75rem;
+            font-weight: 800;
+            color: #fff;
+        }
+
+        .order-price-note {
+            font-size: 0.7rem;
+            color: rgba(255, 255, 255, 0.8);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .order-form .form-group {
+            margin-bottom: 1.25rem;
+        }
+
+        .order-form .form-group label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .order-form .form-group input {
+            width: 100%;
+            padding: 1rem 1.25rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            color: #fff;
+            font-size: 1rem;
+            font-family: inherit;
+            transition: all 0.3s;
+        }
+
+        .order-form .form-group input:focus {
+            outline: none;
+            border-color: #10b981;
+            background: rgba(16, 185, 129, 0.1);
+            box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.1);
+        }
+
+        .order-form .form-group input::placeholder {
+            color: rgba(255, 255, 255, 0.3);
+        }
+
+        .form-hint {
+            display: block;
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.5);
+            margin-top: 0.5rem;
+        }
+
+        .order-submit {
+            width: 100%;
+            padding: 1.25rem;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            border: none;
+            border-radius: 12px;
+            color: #fff;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+            margin-top: 1.5rem;
+        }
+
+        .order-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 40px rgba(16, 185, 129, 0.4);
+        }
+
+        .order-submit:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .order-arrow {
+            transition: transform 0.3s;
+        }
+
+        .order-submit:hover .order-arrow {
+            transform: translateX(5px);
+        }
+
+        .spinner {
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .order-secure {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-top: 1.25rem;
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.85rem;
+        }
+
+        .order-secure svg {
+            color: #10b981;
+        }
+
+        .order-success {
+            text-align: center;
+            padding: 3rem 1rem;
+        }
+
+        .order-success-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            color: #fff;
+            margin: 0 auto 1.5rem;
+        }
+
+        .order-success h3 {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .order-success p {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        @media (max-width: 968px) {
+            .order-container {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+
+            .order-features {
+                grid-template-columns: 1fr;
+            }
+
+            .order-price-badge {
+                right: 20px;
+            }
+        }
+
+        /* Contact Section */
+        .contact {
+            background: linear-gradient(180deg, rgba(99, 102, 241, 0.05) 0%, rgba(99, 102, 241, 0.1) 100%);
+        }
+
+        .contact-container {
+            max-width: 1100px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1.2fr;
+            gap: 4rem;
+            align-items: start;
+        }
+
+        .contact-info h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .contact-info > p {
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 2rem;
+            font-size: 1.1rem;
+        }
+
+        .contact-methods {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .contact-method {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1.25rem;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 16px;
+            transition: all 0.3s;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .contact-method:hover {
+            background: rgba(99, 102, 241, 0.1);
+            border-color: rgba(99, 102, 241, 0.3);
+            transform: translateX(5px);
+        }
+
+        .contact-method-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .contact-method-text h4 {
+            font-size: 1rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .contact-method-text p {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.9rem;
+        }
+
+        /* Contact Form */
+        .contact-form-wrapper {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            padding: 2.5rem;
+        }
+
+        .contact-form h3 {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .contact-form > p {
+            color: rgba(255, 255, 255, 0.6);
+            margin-bottom: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 1rem 1.25rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            color: #fff;
+            font-size: 1rem;
+            font-family: inherit;
+            transition: all 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: rgba(99, 102, 241, 0.1);
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+        }
+
+        .form-group input::placeholder,
+        .form-group textarea::placeholder {
+            color: rgba(255, 255, 255, 0.3);
+        }
+
+        .form-group select option {
+            background: var(--dark);
+            color: #fff;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .form-group textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .form-submit {
+            width: 100%;
+            padding: 1.25rem;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            border: none;
+            border-radius: 12px;
+            color: #fff;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .form-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 40px rgba(99, 102, 241, 0.4);
+        }
+
+        /* Footer */
+        footer {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 4rem 2rem 2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 2rem;
+        }
+
+        .footer-logo {
+            font-size: 1.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #fff 0%, #a5b4fc 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .footer-links a {
+            color: rgba(255, 255, 255, 0.6);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .footer-links a:hover {
+            color: #fff;
+        }
+
+        .footer-copy {
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 0.875rem;
+        }
+
+        /* Success Message */
+        .form-success {
+            display: none;
+            text-align: center;
+            padding: 3rem;
+        }
+
+        .form-success.show {
+            display: block;
+        }
+
+        .form-success-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+
+        .form-success h3 {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-success p {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .contact-form.hidden {
+            display: none;
+        }
+
+        /* Responsive */
+        @media (max-width: 968px) {
+            .nav-links {
+                display: none;
+            }
+
+            .pricing-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .pricing-card.featured {
+                transform: none;
+            }
+
+            .pricing-card.featured:hover {
+                transform: translateY(-5px);
+            }
+
+            .contact-container {
+                grid-template-columns: 1fr;
+            }
+
+            .case-study-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .case-study-insights {
+                grid-template-columns: 1fr;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .stats-bar {
+                flex-wrap: wrap;
+                gap: 2rem;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .hero h1 {
+                font-size: 2rem;
+            }
+
+            .solution-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .case-study {
+                padding: 2rem;
+            }
+
+            .case-study-stats {
+                grid-template-columns: 1fr 1fr;
+                gap: 1rem;
+            }
+
+            .case-stat-value {
+                font-size: 1.75rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Background Animation -->
+    <div class="bg-animation">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
+    </div>
+
+    <!-- Navigation -->
+    <nav id="navbar">
+        <div class="nav-container">
+            <div class="logo">ReviewIQ</div>
+            <ul class="nav-links">
+                <li><a href="#solution">Rješenje</a></li>
+                <li><a href="#case-study">Case Study</a></li>
+                <li><a href="#pricing">Cijene</a></li>
+                <li><a href="#order">Naruči</a></li>
+            </ul>
+            <a href="#order" class="nav-cta">Naruči €49</a>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <div class="hero-badge">AI-Powered Review Intelligence</div>
+            <h1>Pretvorite recenzije u <span>poslovne odluke</span></h1>
+            <p>Saznajte točno što gosti iz svake zemlje misle o vašem restoranu ili hotelu. Nacionalnost + sentiment + akcijski plan.</p>
+            <div class="hero-buttons">
+                <a href="#contact" class="btn btn-primary">
+                    Besplatna konzultacija
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M5 12h14M12 5l7 7-7 7"/>
+                    </svg>
+                </a>
+                <a href="sample-report.html" class="btn btn-secondary">
+                    Pogledaj primjer
+                </a>
+            </div>
+            <div class="stats-bar">
+                <div class="stat">
+                    <div class="stat-value">50+</div>
+                    <div class="stat-label">Zemalja u analizi</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value">48h</div>
+                    <div class="stat-label">Vrijeme isporuke</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value">97%</div>
+                    <div class="stat-label">Zadovoljnih klijenata</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Solution Section -->
+    <section class="solution" id="solution">
+        <div class="section-header">
+            <div class="section-badge">Rješenje</div>
+            <h2>AI analiza koja vam daje odgovore</h2>
+            <p>Pretvaramo vaše recenzije u strukturirane uvide s konkretnim preporukama.</p>
+        </div>
+        <div class="solution-grid">
+            <div class="solution-card">
+                <div class="solution-icon">🌍</div>
+                <h3>Analiza po nacionalnosti</h3>
+                <p>Jedini na tržištu koji ekstrahira zemlju porijekla svakog recenzenta.</p>
+                <ul class="solution-features">
+                    <li>Breakdown po 50+ zemalja</li>
+                    <li>Kulturološki kontekst</li>
+                    <li>Trendovi po tržištima</li>
+                </ul>
+            </div>
+            <div class="solution-card">
+                <div class="solution-icon">💬</div>
+                <h3>Sentiment analiza</h3>
+                <p>AI analizira svaku recenziju i kategorizira feedback.</p>
+                <ul class="solution-features">
+                    <li>Pozitivno / Negativno / Neutralno</li>
+                    <li>Ključne riječi i teme</li>
+                    <li>Usporedba s konkurencijom</li>
+                </ul>
+            </div>
+            <div class="solution-card">
+                <div class="solution-icon">📋</div>
+                <h3>Akcijski plan</h3>
+                <p>Konkretne preporuke što promijeniti, prioritetizirano po utjecaju.</p>
+                <ul class="solution-features">
+                    <li>Top 5 prioriteta za poboljšanje</li>
+                    <li>Što zadržati (vaše snage)</li>
+                    <li>Quick wins vs dugoročno</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- Case Study -->
+    <section id="case-study">
+        <div class="section-header">
+            <div class="section-badge">Case Study</div>
+            <h2>Primjer analize za premium restoran</h2>
+            <p>Pogledajte kakve uvide dobijete iz ReviewIQ analize.</p>
+        </div>
+        <div class="case-study">
+            <div class="case-study-header">
+                <div class="case-study-logo" style="background: linear-gradient(135deg, #6366f1 0%, #ec4899 100%);">M</div>
+                <div class="case-study-title">
+                    <h3>Mare Azzurro</h3>
+                    <p>Fine dining • Obala • 4.5★ TripAdvisor</p>
+                </div>
+            </div>
+            <div class="case-study-stats">
+                <div class="case-stat">
+                    <div class="case-stat-value">1,247</div>
+                    <div class="case-stat-label">Analiziranih recenzija</div>
+                </div>
+                <div class="case-stat">
+                    <div class="case-stat-value">38</div>
+                    <div class="case-stat-label">Različitih zemalja</div>
+                </div>
+                <div class="case-stat">
+                    <div class="case-stat-value">4.7</div>
+                    <div class="case-stat-label">Prosječna ocjena</div>
+                </div>
+                <div class="case-stat">
+                    <div class="case-stat-value">91%</div>
+                    <div class="case-stat-label">Pozitivan sentiment</div>
+                </div>
+            </div>
+            <div class="case-study-insights">
+                <div class="insight">
+                    <div class="insight-header">
+                        <div class="insight-flag flag-uk"></div>
+                        <div>
+                            <span class="insight-country">Velika Britanija</span>
+                            <span class="insight-percent">24% gostiju</span>
+                        </div>
+                    </div>
+                    <p>Hvale pogled na more i svježu ribu. <strong>15% žali se na cijene</strong> - uvođenje "sunset menija" povećalo bi konverziju.</p>
+                </div>
+                <div class="insight">
+                    <div class="insight-header">
+                        <div class="insight-flag flag-us"></div>
+                        <div>
+                            <span class="insight-country">SAD</span>
+                            <span class="insight-percent">21% gostiju</span>
+                        </div>
+                    </div>
+                    <p>Iznimno zadovoljni uslugom - <strong>96% pozitivno!</strong> Ključna riječ: "exceptional service". Vaše najjače tržište.</p>
+                </div>
+                <div class="insight">
+                    <div class="insight-header">
+                        <div class="insight-flag flag-de"></div>
+                        <div>
+                            <span class="insight-country">Njemačka</span>
+                            <span class="insight-percent">14% gostiju</span>
+                        </div>
+                    </div>
+                    <p>Cijene kvalitetu hrane, ali <strong>19% kritizira porcije</strong>. Preporuka: oznaka "XL" opcija za glavna jela.</p>
+                </div>
+                <div class="insight">
+                    <div class="insight-header">
+                        <div class="insight-flag flag-fr"></div>
+                        <div>
+                            <span class="insight-country">Francuska</span>
+                            <span class="insight-percent">11% gostiju</span>
+                        </div>
+                    </div>
+                    <p>Oduševljeni svježinom ribe, ali <strong>28% kritizira vinski izbor</strong>. Proširite francuska i lokalna vina.</p>
+                </div>
+            </div>
+            <div class="case-study-footer">
+                <div class="case-study-badge">
+                    <span class="case-study-badge-icon">✨</span>
+                    <span>Ovakve uvide dobijete za <strong>vaš</strong> restoran ili hotel</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pricing -->
+    <section class="pricing" id="pricing">
+        <div class="section-header">
+            <div class="section-badge">Cijene</div>
+            <h2>Transparentne cijene, bez skrivenih troškova</h2>
+            <p>Odaberite paket koji odgovara vašim potrebama.</p>
+        </div>
+        <div class="pricing-grid">
+            <div class="pricing-card">
+                <div class="pricing-tier">Starter</div>
+                <div class="pricing-name">Quick Audit</div>
+                <div class="pricing-price">
+                    <span class="currency">€</span><span class="amount">297</span>
+                </div>
+                <p class="pricing-desc">Idealno za prvi uvid</p>
+                <ul class="pricing-features">
+                    <li>Do 300 recenzija</li>
+                    <li>1 platforma</li>
+                    <li>Breakdown po nacionalnosti</li>
+                    <li>Sentiment analiza</li>
+                    <li>PDF izvještaj</li>
+                    <li>Isporuka: 72h</li>
+                </ul>
+                <a href="#contact" class="btn btn-secondary" style="width: 100%;">Odaberi</a>
+            </div>
+            <div class="pricing-card featured">
+                <div class="pricing-tier">Professional</div>
+                <div class="pricing-name">Full Analysis</div>
+                <div class="pricing-price">
+                    <span class="currency">€</span><span class="amount">597</span>
+                </div>
+                <p class="pricing-desc">Kompletna analiza</p>
+                <ul class="pricing-features">
+                    <li>Do 1000 recenzija</li>
+                    <li>TripAdvisor + Google</li>
+                    <li>Detaljna analiza po zemljama</li>
+                    <li>Usporedba s konkurentom</li>
+                    <li>Interaktivni dashboard</li>
+                    <li>30-min konzultacijski poziv</li>
+                    <li>Isporuka: 48h</li>
+                </ul>
+                <a href="#contact" class="btn btn-primary" style="width: 100%;">Odaberi</a>
+            </div>
+            <div class="pricing-card">
+                <div class="pricing-tier">Enterprise</div>
+                <div class="pricing-name">Strategic</div>
+                <div class="pricing-price">
+                    <span class="currency">€</span><span class="amount">1,497</span>
+                </div>
+                <p class="pricing-desc">Za grupe i lance</p>
+                <ul class="pricing-features">
+                    <li>Neograničeno recenzija</li>
+                    <li>Sve platforme</li>
+                    <li>Do 5 lokacija</li>
+                    <li>3 konkurenta</li>
+                    <li>Kvartalni monitoring</li>
+                    <li>PowerPoint prezentacija</li>
+                    <li>2h strateški workshop</li>
+                </ul>
+                <a href="#contact" class="btn btn-secondary" style="width: 100%;">Kontaktiraj</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Quick Order Section -->
+    <section class="order-section" id="order">
+        <div class="order-container">
+            <div class="order-content">
+                <div class="section-badge">Brza narudžba</div>
+                <h2>Naručite analizu odmah</h2>
+                <p>Unesite link vašeg restorana i primite izvještaj u roku 24-48h.</p>
+
+                <div class="order-features">
+                    <div class="order-feature">
+                        <span class="order-feature-icon">🌍</span>
+                        <span>Analiza po zemljama</span>
+                    </div>
+                    <div class="order-feature">
+                        <span class="order-feature-icon">📊</span>
+                        <span>Bubble chart vizualizacija</span>
+                    </div>
+                    <div class="order-feature">
+                        <span class="order-feature-icon">🔗</span>
+                        <span>Web + PDF verzija</span>
+                    </div>
+                    <div class="order-feature">
+                        <span class="order-feature-icon">⏰</span>
+                        <span>3 mjeseca pristup</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="order-form-wrapper">
+                <div class="order-price-badge">
+                    <span class="order-price">€49</span>
+                    <span class="order-price-note">jednokratno</span>
+                </div>
+
+                <form class="order-form" id="orderForm">
+                    <div class="form-group">
+                        <label for="orderEmail">Vaš email *</label>
+                        <input type="email" id="orderEmail" name="email" required placeholder="vas@email.com">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="restaurantUrl">Link na restoran (TripAdvisor) *</label>
+                        <input type="url" id="restaurantUrl" name="restaurant_url" required placeholder="https://www.tripadvisor.com/Restaurant_Review-...">
+                        <span class="form-hint">Kopirajte puni URL s TripAdvisor stranice vašeg restorana</span>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="restaurantName">Naziv restorana</label>
+                        <input type="text" id="restaurantName" name="restaurant_name" placeholder="Restaurant Nautika">
+                    </div>
+
+                    <button type="submit" class="order-submit" id="orderSubmit">
+                        <span class="order-submit-text">Nastavi na plaćanje</span>
+                        <span class="order-submit-loading" style="display: none;">
+                            <svg class="spinner" width="20" height="20" viewBox="0 0 24 24">
+                                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3" fill="none" opacity="0.3"/>
+                                <path d="M12 2a10 10 0 0 1 10 10" stroke="currentColor" stroke-width="3" fill="none" stroke-linecap="round"/>
+                            </svg>
+                            Učitavanje...
+                        </span>
+                        <svg class="order-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M5 12h14M12 5l7 7-7 7"/>
+                        </svg>
+                    </button>
+
+                    <div class="order-secure">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                            <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                        </svg>
+                        <span>Sigurno plaćanje preko Stripe</span>
+                    </div>
+                </form>
+
+                <div class="order-success" id="orderSuccess" style="display: none;">
+                    <div class="order-success-icon">✓</div>
+                    <h3>Preusmjeravanje na Stripe...</h3>
+                    <p>Molimo pričekajte.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section class="contact" id="contact">
+        <div class="contact-container">
+            <div class="contact-info">
+                <h2>Spremni za uvide?</h2>
+                <p>Javite nam se i saznajte što vaše recenzije stvarno govore. Besplatna konzultacija.</p>
+
+                <div class="contact-methods">
+                    <a href="mailto:info@reviewiq.hr" class="contact-method">
+                        <div class="contact-method-icon">📧</div>
+                        <div class="contact-method-text">
+                            <h4>Email</h4>
+                            <p>info@reviewiq.hr</p>
+                        </div>
+                    </a>
+                    <a href="https://wa.me/385xxxxxxxxx" class="contact-method">
+                        <div class="contact-method-icon">💬</div>
+                        <div class="contact-method-text">
+                            <h4>WhatsApp</h4>
+                            <p>+385 xx xxx xxxx</p>
+                        </div>
+                    </a>
+                    <a href="#" class="contact-method">
+                        <div class="contact-method-icon">📅</div>
+                        <div class="contact-method-text">
+                            <h4>Zakaži poziv</h4>
+                            <p>15-min besplatna konzultacija</p>
+                        </div>
+                    </a>
+                </div>
+            </div>
+
+            <div class="contact-form-wrapper">
+                <form class="contact-form" id="contactForm" action="https://formspree.io/f/YOUR_FORM_ID" method="POST">
+                    <h3>Zatražite ponudu</h3>
+                    <p>Ispunite formu i javimo vam se u roku 24 sata.</p>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="name">Ime i prezime *</label>
+                            <input type="text" id="name" name="name" required placeholder="Vaše ime">
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Email *</label>
+                            <input type="email" id="email" name="email" required placeholder="vas@email.com">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="business">Naziv biznisa *</label>
+                            <input type="text" id="business" name="business" required placeholder="Restaurant XYZ">
+                        </div>
+                        <div class="form-group">
+                            <label for="phone">Telefon</label>
+                            <input type="tel" id="phone" name="phone" placeholder="+385 xx xxx xxxx">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="platform">Koja platforma vas zanima? *</label>
+                        <select id="platform" name="platform" required>
+                            <option value="">Odaberite...</option>
+                            <option value="tripadvisor">TripAdvisor</option>
+                            <option value="google">Google Reviews</option>
+                            <option value="both">Obje platforme</option>
+                            <option value="other">Ostalo (Booking, Yelp...)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="url">Link na vaš profil (TripAdvisor/Google)</label>
+                        <input type="url" id="url" name="url" placeholder="https://www.tripadvisor.com/...">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="message">Poruka</label>
+                        <textarea id="message" name="message" placeholder="Opišite što vas zanima, koliko recenzija imate..."></textarea>
+                    </div>
+
+                    <button type="submit" class="form-submit">
+                        Pošalji upit
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/>
+                        </svg>
+                    </button>
+                </form>
+
+                <div class="form-success" id="formSuccess">
+                    <div class="form-success-icon">✅</div>
+                    <h3>Hvala na upitu!</h3>
+                    <p>Javimo vam se u roku 24 sata s ponudom.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-logo">ReviewIQ</div>
+            <div class="footer-links">
+                <a href="#solution">Rješenje</a>
+                <a href="#pricing">Cijene</a>
+                <a href="#order">Naruči</a>
+                <a href="#contact">Kontakt</a>
+            </div>
+            <div class="footer-copy">© 2025 ReviewIQ. Sva prava pridržana.</div>
+        </div>
+    </footer>
+
+    <script>
+        // API Configuration - change this to your backend URL in production
+        const API_BASE_URL = 'http://localhost:8000';
+
+        // Navbar scroll effect
+        const navbar = document.getElementById('navbar');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+
+        // Order Form - Stripe Checkout
+        document.getElementById('orderForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const submitBtn = document.getElementById('orderSubmit');
+            const submitText = submitBtn.querySelector('.order-submit-text');
+            const submitLoading = submitBtn.querySelector('.order-submit-loading');
+            const arrow = submitBtn.querySelector('.order-arrow');
+
+            // Get form data
+            const email = document.getElementById('orderEmail').value;
+            const restaurantUrl = document.getElementById('restaurantUrl').value;
+            const restaurantName = document.getElementById('restaurantName').value || 'Restaurant';
+
+            // Validate URL is TripAdvisor
+            if (!restaurantUrl.includes('tripadvisor.com') && !restaurantUrl.includes('tripadvisor.')) {
+                alert('Molimo unesite validan TripAdvisor link');
+                return;
+            }
+
+            // Show loading state
+            submitBtn.disabled = true;
+            submitText.style.display = 'none';
+            submitLoading.style.display = 'flex';
+            arrow.style.display = 'none';
+
+            try {
+                // Call backend to create Stripe checkout session
+                const response = await fetch(`${API_BASE_URL}/create-checkout`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        email: email,
+                        restaurant_url: restaurantUrl,
+                        restaurant_name: restaurantName
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error('Greška prilikom kreiranja narudžbe');
+                }
+
+                const data = await response.json();
+
+                // Show success message briefly
+                document.getElementById('orderForm').style.display = 'none';
+                document.getElementById('orderSuccess').style.display = 'block';
+
+                // Redirect to Stripe Checkout
+                setTimeout(() => {
+                    window.location.href = data.checkout_url;
+                }, 500);
+
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Došlo je do greške. Molimo pokušajte ponovno ili nas kontaktirajte.');
+
+                // Reset button
+                submitBtn.disabled = false;
+                submitText.style.display = 'inline';
+                submitLoading.style.display = 'none';
+                arrow.style.display = 'inline';
+            }
+        });
+
+        // Check for canceled payment (redirect back from Stripe)
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('canceled') === 'true') {
+            // Show message that payment was canceled
+            const orderSection = document.getElementById('order');
+            if (orderSection) {
+                orderSection.scrollIntoView({ behavior: 'smooth' });
+                setTimeout(() => {
+                    alert('Plaćanje je otkazano. Možete pokušati ponovno.');
+                }, 500);
+            }
+            // Clear the URL parameter
+            window.history.replaceState({}, document.title, window.location.pathname);
+        }
+
+        // Contact Form submission
+        document.getElementById('contactForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const formData = new FormData(this);
+            const data = Object.fromEntries(formData);
+
+            // Show success message
+            this.classList.add('hidden');
+            document.getElementById('formSuccess').classList.add('show');
+
+            // Send email via mailto as fallback
+            const subject = encodeURIComponent(`ReviewIQ Upit: ${data.business}`);
+            const body = encodeURIComponent(`
+Ime: ${data.name}
+Email: ${data.email}
+Biznis: ${data.business}
+Telefon: ${data.phone || 'Nije navedeno'}
+Platforma: ${data.platform}
+URL: ${data.url || 'Nije navedeno'}
+
+Poruka:
+${data.message || 'Bez dodatne poruke'}
+            `);
+
+            // Open email client
+            window.location.href = `mailto:info@reviewiq.hr?subject=${subject}&body=${body}`;
+        });
+
+        // Smooth scroll
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>

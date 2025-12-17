@@ -1,0 +1,39 @@
+# ReviewIQ Backend Requirements
+# =============================
+
+# Web Framework
+fastapi==0.109.0
+uvicorn[standard]==0.27.0
+
+# Stripe
+stripe==7.12.0
+
+# Database
+# SQLite is built-in, no extra package needed
+
+# HTTP Client (for email API)
+httpx==0.26.0
+
+# Data Processing
+pandas==2.1.4
+numpy==1.26.3
+
+# Environment
+python-dotenv==1.0.0
+
+# Validation
+pydantic[email]==2.5.3
+
+# PDF Generation & Browser Automation
+playwright==1.41.0
+# NOTE: After pip install, run: playwright install chromium
+
+# Scraping dependencies
+beautifulsoup4==4.12.3
+lxml==5.1.0
+selenium==4.17.2
+webdriver-manager==4.0.1
+undetected-chromedriver==3.5.5
+
+# Async support
+aiofiles==23.2.1

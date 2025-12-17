@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="hr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Primjer Analize | ReviewIQ</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #6366f1;
+            --secondary: #ec4899;
+            --accent: #06b6d4;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --dark: #0f172a;
+            --dark-light: #1e293b;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #312e81 100%);
+            color: #fff;
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        /* Back button */
+        .back-btn {
+            position: fixed;
+            top: 1.5rem;
+            left: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.25rem;
+            background: rgba(236, 72, 153, 0.2);
+            border: 1px solid rgba(236, 72, 153, 0.4);
+            border-radius: 50px;
+            color: #ec4899;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+            z-index: 100;
+        }
+
+        .back-btn:hover {
+            background: rgba(236, 72, 153, 0.3);
+            transform: translateX(-3px);
+        }
+
+        /* Header */
+        .report-header {
+            text-align: center;
+            padding: 5rem 2rem 3rem;
+        }
+
+        .report-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #f59e0b, #f97316);
+            color: #000;
+            padding: 0.75rem 2rem;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 0.85rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            margin-bottom: 2rem;
+        }
+
+        .report-header h1 {
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            font-weight: 900;
+            background: linear-gradient(135deg, #fff, #a5b4fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1rem;
+        }
+
+        .report-header .restaurant-name {
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .report-header .restaurant-info {
+            color: rgba(255,255,255,0.6);
+            font-size: 1.1rem;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem;
+            max-width: 1000px;
+            margin: 3rem auto;
+            padding: 0 2rem;
+        }
+
+        .stat-card {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 20px;
+            padding: 2rem;
+            text-align: center;
+            transition: all 0.3s;
+        }
+
+        .stat-card:hover {
+            background: rgba(99, 102, 241, 0.1);
+            border-color: rgba(99, 102, 241, 0.3);
+            transform: translateY(-5px);
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-value.green { color: #10b981; }
+        .stat-value.blue { color: #06b6d4; }
+        .stat-value.purple { color: #a78bfa; }
+        .stat-value.yellow { color: #fbbf24; }
+
+        .stat-label {
+            font-size: 0.95rem;
+            color: rgba(255,255,255,0.7);
+        }
+
+        .stat-sublabel {
+            font-size: 0.8rem;
+            color: rgba(255,255,255,0.4);
+            margin-top: 0.25rem;
+        }
+
+        /* Section */
+        section {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 3rem 2rem;
+        }
+
+        .section-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #10b981, #06b6d4);
+            color: #000;
+            padding: 0.5rem 1.5rem;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 0.8rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            margin-bottom: 1.5rem;
+        }
+
+        .section-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            text-align: center;
+            margin-bottom: 0.75rem;
+        }
+
+        .section-subtitle {
+            text-align: center;
+            color: rgba(255,255,255,0.6);
+            margin-bottom: 3rem;
+        }
+
+        /* Bubble Chart */
+        .bubble-stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+            margin-bottom: 3rem;
+        }
+
+        .bubble-stat {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            border-radius: 16px;
+            padding: 1.5rem;
+            text-align: center;
+        }
+
+        .bubble-stat:nth-child(2) {
+            background: rgba(6, 182, 212, 0.1);
+            border-color: rgba(6, 182, 212, 0.2);
+        }
+
+        .bubble-stat:nth-child(3) {
+            background: rgba(167, 139, 250, 0.1);
+            border-color: rgba(167, 139, 250, 0.2);
+        }
+
+        .bubble-stat:nth-child(4) {
+            background: rgba(251, 191, 36, 0.1);
+            border-color: rgba(251, 191, 36, 0.2);
+        }
+
+        .bubble-stat-value {
+            font-size: 1.75rem;
+            font-weight: 800;
+        }
+
+        .bubble-stat:nth-child(1) .bubble-stat-value { color: #10b981; }
+        .bubble-stat:nth-child(2) .bubble-stat-value { color: #06b6d4; }
+        .bubble-stat:nth-child(3) .bubble-stat-value { color: #a78bfa; }
+        .bubble-stat:nth-child(4) .bubble-stat-value { color: #fbbf24; }
+
+        .bubble-stat-label {
+            font-size: 0.85rem;
+            color: rgba(255,255,255,0.7);
+            margin-top: 0.25rem;
+        }
+
+        .bubble-stat-sub {
+            font-size: 0.75rem;
+            color: rgba(255,255,255,0.4);
+        }
+
+        /* Country Bubbles */
+        .country-bubbles {
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            gap: 1rem;
+            flex-wrap: wrap;
+            padding: 2rem 0;
+        }
+
+        .country-bubble {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            position: relative;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .country-bubble:hover {
+            transform: scale(1.1);
+            z-index: 10;
+        }
+
+        .country-bubble.size-xl {
+            width: 180px;
+            height: 180px;
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.3), rgba(16, 185, 129, 0.1));
+            border: 3px solid rgba(16, 185, 129, 0.5);
+            box-shadow: 0 0 40px rgba(16, 185, 129, 0.3);
+        }
+
+        .country-bubble.size-lg {
+            width: 140px;
+            height: 140px;
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.25), rgba(16, 185, 129, 0.08));
+            border: 2px solid rgba(16, 185, 129, 0.4);
+            box-shadow: 0 0 30px rgba(16, 185, 129, 0.2);
+        }
+
+        .country-bubble.size-md {
+            width: 110px;
+            height: 110px;
+            background: linear-gradient(135deg, rgba(6, 182, 212, 0.25), rgba(6, 182, 212, 0.08));
+            border: 2px solid rgba(6, 182, 212, 0.4);
+            box-shadow: 0 0 25px rgba(6, 182, 212, 0.2);
+        }
+
+        .country-bubble.size-sm {
+            width: 90px;
+            height: 90px;
+            background: linear-gradient(135deg, rgba(167, 139, 250, 0.25), rgba(167, 139, 250, 0.08));
+            border: 2px solid rgba(167, 139, 250, 0.4);
+            box-shadow: 0 0 20px rgba(167, 139, 250, 0.2);
+        }
+
+        .country-bubble.highlight {
+            background: linear-gradient(135deg, rgba(251, 191, 36, 0.4), rgba(251, 191, 36, 0.15));
+            border: 3px solid rgba(251, 191, 36, 0.6);
+            box-shadow: 0 0 35px rgba(251, 191, 36, 0.4);
+        }
+
+        .bubble-flag {
+            font-size: 2rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .country-bubble.size-xl .bubble-flag { font-size: 2.5rem; }
+        .country-bubble.size-sm .bubble-flag { font-size: 1.5rem; }
+
+        .bubble-country {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: rgba(255,255,255,0.9);
+        }
+
+        .country-bubble.size-xl .bubble-country { font-size: 0.9rem; }
+        .country-bubble.size-sm .bubble-country { font-size: 0.65rem; }
+
+        .bubble-rating {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: #fff;
+        }
+
+        .country-bubble.size-xl .bubble-rating { font-size: 2rem; }
+        .country-bubble.size-sm .bubble-rating { font-size: 1.1rem; }
+
+        .bubble-reviews {
+            font-size: 0.7rem;
+            color: rgba(255,255,255,0.6);
+        }
+
+        .country-bubble.size-sm .bubble-reviews { font-size: 0.6rem; }
+
+        /* Insights Section */
+        .insights-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+            margin-top: 3rem;
+        }
+
+        .insight-card {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 20px;
+            padding: 2rem;
+            transition: all 0.3s;
+        }
+
+        .insight-card:hover {
+            background: rgba(99, 102, 241, 0.08);
+            border-color: rgba(99, 102, 241, 0.2);
+            transform: translateY(-3px);
+        }
+
+        .insight-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .insight-flag-bubble {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.75rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+
+        .insight-flag-bubble.uk { background: linear-gradient(135deg, #012169, #C8102E); }
+        .insight-flag-bubble.us { background: linear-gradient(135deg, #3C3B6E, #B22234); }
+        .insight-flag-bubble.de { background: linear-gradient(180deg, #000 33%, #DD0000 33%, #DD0000 66%, #FFCE00 66%); }
+        .insight-flag-bubble.fr { background: linear-gradient(90deg, #002395 33%, #fff 33%, #fff 66%, #ED2939 66%); }
+
+        .insight-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+        }
+
+        .insight-percent {
+            font-size: 0.9rem;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 700;
+        }
+
+        .insight-card p {
+            color: rgba(255,255,255,0.7);
+            line-height: 1.7;
+        }
+
+        .insight-card strong {
+            color: #fbbf24;
+        }
+
+        .insight-card .recommendation {
+            display: inline-block;
+            background: rgba(16, 185, 129, 0.15);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            color: #10b981;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            margin-top: 1rem;
+            font-weight: 600;
+        }
+
+        /* CTA Section */
+        .cta-section {
+            text-align: center;
+            padding: 4rem 2rem;
+            margin-top: 2rem;
+        }
+
+        .cta-box {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(236, 72, 153, 0.1));
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            border-radius: 24px;
+            padding: 3rem;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .cta-box h2 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .cta-box p {
+            color: rgba(255,255,255,0.7);
+            margin-bottom: 2rem;
+            font-size: 1.1rem;
+        }
+
+        .cta-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: #fff;
+            padding: 1rem 2.5rem;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 1.1rem;
+            transition: all 0.3s;
+        }
+
+        .cta-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 20px 50px rgba(99, 102, 241, 0.4);
+        }
+
+        /* Sample Notice */
+        .sample-notice {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(251, 191, 36, 0.2);
+            border: 1px solid rgba(251, 191, 36, 0.4);
+            padding: 0.75rem 1.5rem;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            color: #fbbf24;
+            z-index: 100;
+        }
+
+        /* Responsive */
+        @media (max-width: 968px) {
+            .stats-grid, .bubble-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .insights-grid {
+                grid-template-columns: 1fr;
+            }
+            .country-bubbles {
+                gap: 0.5rem;
+            }
+            .country-bubble.size-xl { width: 140px; height: 140px; }
+            .country-bubble.size-lg { width: 110px; height: 110px; }
+            .country-bubble.size-md { width: 90px; height: 90px; }
+            .country-bubble.size-sm { width: 75px; height: 75px; }
+        }
+
+        @media (max-width: 640px) {
+            .stats-grid, .bubble-stats {
+                grid-template-columns: 1fr;
+            }
+            .country-bubble.size-xl { width: 120px; height: 120px; }
+            .country-bubble.size-lg { width: 100px; height: 100px; }
+        }
+    </style>
+</head>
+<body>
+    <a href="index.html" class="back-btn">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M19 12H5M12 19l-7-7 7-7"/>
+        </svg>
+        Povratak
+    </a>
+
+    <div class="sample-notice">
+        Ovo je primjer izvještaja s izmišljenim podacima
+    </div>
+
+    <!-- Header -->
+    <header class="report-header">
+        <div class="report-badge">Primjer Izvještaja</div>
+        <h1>DUBINSKA AI ANALIZA</h1>
+        <p class="restaurant-name">Mare Azzurro Restaurant</p>
+        <p class="restaurant-info">Fine Dining • Obala • TripAdvisor + Google</p>
+    </header>
+
+    <!-- Main Stats -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-value green">1,247</div>
+            <div class="stat-label">Recenzija analizirano</div>
+            <div class="stat-sublabel">TripAdvisor 2020-2025</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value blue">38+</div>
+            <div class="stat-label">Zemalja identificirano</div>
+            <div class="stat-sublabel">Geo-analiza gostiju</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value purple">4.7</div>
+            <div class="stat-label">Prosječna ocjena</div>
+            <div class="stat-sublabel">Iznad prosjeka regije</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value yellow">91%</div>
+            <div class="stat-label">Pozitivan sentiment</div>
+            <div class="stat-sublabel">AI analiza teksta</div>
+        </div>
+    </div>
+
+    <!-- Country Analysis -->
+    <section>
+        <div style="text-align: center;">
+            <div class="section-badge">Bubble Chart</div>
+        </div>
+        <h2 class="section-title">OCJENE PO ZEMLJAMA</h2>
+        <p class="section-subtitle">Veličina kruga = broj recenzija</p>
+
+        <div class="bubble-stats">
+            <div class="bubble-stat">
+                <div class="bubble-stat-value">1,247</div>
+                <div class="bubble-stat-label">Ukupno recenzija</div>
+                <div class="bubble-stat-sub">sve platforme</div>
+            </div>
+            <div class="bubble-stat">
+                <div class="bubble-stat-value">892</div>
+                <div class="bubble-stat-label">S lokacijom gosta</div>
+                <div class="bubble-stat-sub">identificirana zemlja</div>
+            </div>
+            <div class="bubble-stat">
+                <div class="bubble-stat-value">71.5%</div>
+                <div class="bubble-stat-label">Identificirano</div>
+                <div class="bubble-stat-sub">uspješnost prepoznavanja</div>
+            </div>
+            <div class="bubble-stat">
+                <div class="bubble-stat-value">38+</div>
+                <div class="bubble-stat-label">Različitih zemalja</div>
+                <div class="bubble-stat-sub">globalna prisutnost</div>
+            </div>
+        </div>
+
+        <!-- Bubble Visualization -->
+        <div class="country-bubbles">
+            <div class="country-bubble size-xl">
+                <span class="bubble-flag">🇬🇧</span>
+                <span class="bubble-country">Ujed. Kraljevstvo</span>
+                <span class="bubble-rating">4.72</span>
+                <span class="bubble-reviews">298 recenzija</span>
+            </div>
+            <div class="country-bubble size-lg">
+                <span class="bubble-flag">🇺🇸</span>
+                <span class="bubble-country">SAD</span>
+                <span class="bubble-rating">4.81</span>
+                <span class="bubble-reviews">186 rec</span>
+            </div>
+            <div class="country-bubble size-md">
+                <span class="bubble-flag">🇩🇪</span>
+                <span class="bubble-country">Njemačka</span>
+                <span class="bubble-rating">4.58</span>
+                <span class="bubble-reviews">124 rec</span>
+            </div>
+            <div class="country-bubble size-md">
+                <span class="bubble-flag">🇫🇷</span>
+                <span class="bubble-country">Francuska</span>
+                <span class="bubble-rating">4.45</span>
+                <span class="bubble-reviews">98 rec</span>
+            </div>
+            <div class="country-bubble size-sm highlight">
+                <span class="bubble-flag">🇭🇷</span>
+                <span class="bubble-country">Hrvatska</span>
+                <span class="bubble-rating">4.89</span>
+                <span class="bubble-reviews">67 rec</span>
+            </div>
+            <div class="country-bubble size-sm">
+                <span class="bubble-flag">🇮🇹</span>
+                <span class="bubble-country">Italija</span>
+                <span class="bubble-rating">4.52</span>
+                <span class="bubble-reviews">54 rec</span>
+            </div>
+            <div class="country-bubble size-sm">
+                <span class="bubble-flag">🇳🇱</span>
+                <span class="bubble-country">Nizozemska</span>
+                <span class="bubble-rating">4.63</span>
+                <span class="bubble-reviews">41 rec</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Insights -->
+    <section>
+        <div style="text-align: center;">
+            <div class="section-badge">Ključni Uvidi</div>
+        </div>
+        <h2 class="section-title">ANALIZA PO TRŽIŠTIMA</h2>
+        <p class="section-subtitle">Konkretne preporuke za svako tržište</p>
+
+        <div class="insights-grid">
+            <div class="insight-card">
+                <div class="insight-header">
+                    <div class="insight-flag-bubble uk">🇬🇧</div>
+                    <div>
+                        <div class="insight-title">Velika Britanija</div>
+                        <div class="insight-percent">24% vaših gostiju • 4.72 ocjena</div>
+                    </div>
+                </div>
+                <p>Britanci najviše hvale <strong>pogled na more</strong> i <strong>svježinu ribe</strong>. Međutim, <strong>15% recenzija spominje "expensive"</strong> ili "overpriced" - što ukazuje na potrebu za value opcijom.</p>
+                <div class="recommendation">Preporuka: Uvedite "Sunset Menu" (17-19h) s nižim cijenama</div>
+            </div>
+
+            <div class="insight-card">
+                <div class="insight-header">
+                    <div class="insight-flag-bubble us">🇺🇸</div>
+                    <div>
+                        <div class="insight-title">Sjedinjene Države</div>
+                        <div class="insight-percent">21% vaših gostiju • 4.81 ocjena</div>
+                    </div>
+                </div>
+                <p>Amerikanci su vaši <strong>najzadovoljniji gosti</strong> - 96% pozitivnog sentimenta! Ključna riječ: <strong>"exceptional service"</strong>. Ovo je vaše najjače premium tržište.</p>
+                <div class="recommendation">Preporuka: Targetirajte američke turiste s premium ponudom</div>
+            </div>
+
+            <div class="insight-card">
+                <div class="insight-header">
+                    <div class="insight-flag-bubble de">🇩🇪</div>
+                    <div>
+                        <div class="insight-title">Njemačka</div>
+                        <div class="insight-percent">14% vaših gostiju • 4.58 ocjena</div>
+                    </div>
+                </div>
+                <p>Nijemci cijene kvalitetu hrane, ali <strong>19% kritizira veličinu porcija</strong> ("portion size", "small portions"). Ovo je konzistentna tema kroz sve godine.</p>
+                <div class="recommendation">Preporuka: Ponudite "XL" opciju za glavna jela (+€5)</div>
+            </div>
+
+            <div class="insight-card">
+                <div class="insight-header">
+                    <div class="insight-flag-bubble fr">🇫🇷</div>
+                    <div>
+                        <div class="insight-title">Francuska</div>
+                        <div class="insight-percent">11% vaših gostiju • 4.45 ocjena</div>
+                    </div>
+                </div>
+                <p>Francuzi su oduševljeni svježinom ribe i morskim plodovima. Međutim, <strong>28% kritizira vinski izbor</strong> - "limited wine list", "disappointing wines".</p>
+                <div class="recommendation">Preporuka: Proširite ponudu francuskih i lokalnih vina</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA -->
+    <div class="cta-section">
+        <div class="cta-box">
+            <h2>Želite ovakvu analizu za vaš biznis?</h2>
+            <p>Saznajte točno što gosti iz svake zemlje misle o vašem restoranu ili hotelu. Besplatna konzultacija.</p>
+            <a href="index.html#contact" class="cta-btn">
+                Zatražite ponudu
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M5 12h14M12 5l7 7-7 7"/>
+                </svg>
+            </a>
+        </div>
+    </div>
+
+    <script>
+        // Add hover animations
+        document.querySelectorAll('.country-bubble').forEach(bubble => {
+            bubble.addEventListener('mouseenter', function() {
+                this.style.transform = 'scale(1.15)';
+            });
+            bubble.addEventListener('mouseleave', function() {
+                this.style.transform = 'scale(1)';
+            });
+        });
+    </script>
+</body>
+</html>

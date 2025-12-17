@@ -1,0 +1,6 @@
+# ReviewIQ Railway Deployment
+# ===========================
+# Runs both web server and background worker
+
+web: uvicorn main:app --host 0.0.0.0 --port $PORT
+worker: python task_queue.py
